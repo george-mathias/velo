@@ -5,3 +5,10 @@ test('web app deve estar online', async ({ page }) => {
 
   await expect(page).toHaveTitle(/Velô by Papito/)
 })
+
+
+
+
+/* para abrir o codegen do playwright, basta rodar o comando no terminal
+  yarn playwright codegen http://localhost:5173/ 
+*/
