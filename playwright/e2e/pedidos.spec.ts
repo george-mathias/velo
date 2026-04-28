@@ -37,16 +37,47 @@ test.describe('Consulta de Pedidos', () => {
     // await expect(page.getByTestId(`order-result-${orderNumber}`).locator('div', { hasText: /^APROVADO$/ })).toContainText('APROVADO')
   
     /* Código do Papito */
-    const orderCode = page.locator(`//p[text()="Pedido"]/..//p[text()="${orderNumber}"]`)
-    await expect(orderCode).toBeVisible( { timeout: 10_000 } )
+    // const orderCode = page.locator(`//p[text()="Pedido"]/..//p[text()="${orderNumber}"]`)
+    // await expect(orderCode).toBeVisible( { timeout: 10_000 } )
   
-    const containerPedido = page.getByRole('paragraph')
-      .filter( { hasText: /^Pedido$/ } )
-      .locator('..')  // sobe um nível igual ao xpath
+    // const containerPedido = page.getByRole('paragraph')
+    //   .filter( { hasText: /^Pedido$/ } )
+    //   .locator('..')  // sobe um nível igual ao xpath
   
-    await expect(containerPedido).toContainText(`${orderNumber}`)
+    // await expect(containerPedido).toContainText(`${orderNumber}`)
   
-    await expect(page.getByText('APROVADO')).toBeVisible()
+    // await expect(page.getByText('APROVADO')).toBeVisible()
+
+    await expect(page.getByTestId(`order-result-${orderNumber}`)).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: ${orderNumber}
+      - img
+      - text: APROVADO
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: Midnight Black
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: aero Wheels
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: George Mathias
+      - paragraph: Email
+      - paragraph: mathias@gmail.com
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d+\\/\\d+\\/\\d+/
+      - heading "Pagamento" [level=4]
+      - paragraph: À Vista
+      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+      `);
+
+
   })
   
   test('It should return an error message when submitting an invalid order number', async ({ page }) => {
