@@ -11,108 +11,129 @@ test.describe('Consulta de Pedidos', () => {
     // Arrange
     await page.goto(baseUrl)
     await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint')
-  
+
     await page.getByRole('link', { name: 'Consultar Pedido' }).click()
     await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
 
   })
 
-  test('deve consultar um pedido', async ({ page }) => {
+  test('It should display the approved order details after submitting a valid order number', async ({ page }) => {
 
-    const orderNumber = "VLO-IJJFFY"
+    // Test Data
+    const order = {
+      orderNumber: 'VLO-IJJFFY',
+      color: 'Midnight Black',
+      wheels: 'aero Wheels',
+      customer: {
+        name: 'George Mathias',
+        email: 'mathias@gmail.com'
+      },
+      payment_method: 'À Vista',
+      status: 'APROVADO'
+    }
 
     // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(orderNumber)
-    await page.getByRole('button', { name: 'Buscar Pedido'}).click()
-  
-    // Assert
-    /* meu código */
-    // await expect(page.getByTestId(`order-result-${orderNumber}`)).toBeVisible()
-  
-    // await expect(page.getByTestId(`order-result-${orderNumber}`).locator('p', { hasText: /^Pedido$/ })).toBeVisible()
-    // await expect(page.getByTestId(`order-result-${orderNumber}`).locator('p', { hasText: orderNumber })).toBeVisible()
-    // await expect(page.getByTestId(`order-result-${orderNumber}`).locator('p', { hasText: orderNumber })).toContainText(orderNumber)
-  
-    // await expect(page.getByTestId(`order-result-${orderNumber}`).locator('div', { hasText: /^APROVADO$/ })).toBeVisible()
-    // await expect(page.getByTestId(`order-result-${orderNumber}`).locator('div', { hasText: /^APROVADO$/ })).toContainText('APROVADO')
-  
-    /* Código do Papito */
-    // const orderCode = page.locator(`//p[text()="Pedido"]/..//p[text()="${orderNumber}"]`)
-    // await expect(orderCode).toBeVisible( { timeout: 10_000 } )
-  
-    // const containerPedido = page.getByRole('paragraph')
-    //   .filter( { hasText: /^Pedido$/ } )
-    //   .locator('..')  // sobe um nível igual ao xpath
-  
-    // await expect(containerPedido).toContainText(`${orderNumber}`)
-  
-    // await expect(page.getByText('APROVADO')).toBeVisible()
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.orderNumber)
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
-    await expect(page.getByTestId(`order-result-${orderNumber}`)).toMatchAriaSnapshot(`
+    // Assert
+    await expect(page.getByTestId(`order-result-${order.orderNumber}`)).toMatchAriaSnapshot(`
       - img
       - paragraph: Pedido
-      - paragraph: ${orderNumber}
+      - paragraph: ${order.orderNumber}
       - img
-      - text: APROVADO
+      - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
       - paragraph: Cor
-      - paragraph: Midnight Black
+      - paragraph: ${order.color}
       - paragraph: Interior
       - paragraph: cream
       - paragraph: Rodas
-      - paragraph: aero Wheels
+      - paragraph: ${order.wheels}
       - heading "Dados do Cliente" [level=4]
       - paragraph: Nome
-      - paragraph: George Mathias
+      - paragraph: ${order.customer.name}
       - paragraph: Email
-      - paragraph: mathias@gmail.com
+      - paragraph: ${order.customer.email}
       - paragraph: Loja de Retirada
       - paragraph
       - paragraph: Data do Pedido
       - paragraph: /\\d+\\/\\d+\\/\\d+/
       - heading "Pagamento" [level=4]
-      - paragraph: À Vista
+      - paragraph: ${order.payment_method}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-      `);
-
-
+    `);
   })
-  
+
+
+  test('It should display the declined order details after submitting a valid order number', async ({ page }) => {
+
+    // Test Data
+    const order = {
+      orderNumber: 'VLO-DOPGB6',
+      color: 'Midnight Black',
+      wheels: 'sport Wheels',
+      customer: {
+        name: 'Steve Trabalho',
+        email: 'trabalho@apple.com'
+      },
+      payment_method: 'À Vista',
+      status: 'REPROVADO'
+    }
+
+    // Act
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.orderNumber)
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+
+    // Assert
+    await expect(page.getByTestId(`order-result-${order.orderNumber}`)).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: ${order.orderNumber}
+      - img
+      - text: ${order.status}
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: ${order.color}
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: ${order.wheels}
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: ${order.customer.name}
+      - paragraph: Email
+      - paragraph: ${order.customer.email}
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d+\\/\\d+\\/\\d+/
+      - heading "Pagamento" [level=4]
+      - paragraph: ${order.payment_method}
+      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+    `);
+  })
+
+
   test('It should return an error message when submitting an invalid order number', async ({ page }) => {
-  
+
     const orderNumber = generateOrderCode()
     const expectedErrorMessage = "Pedido não encontrado"
     const expectedInformationMessage = "Verifique o número do pedido e tente novamente"
-  
+
     // Act
     await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(orderNumber)
-    await page.getByRole('button', { name: 'Buscar Pedido'}).click()
-  
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+
     // Assert
-    // await expect(page.locator('#root')).toContainText('Pedido não encontrado')
-    // await expect(page.locator('#root')).toContainText('Verifique o número do pedido e tente novamente') 
-  
-    // const title = page.getByRole('heading', { name: 'Pedido não encontrado', level: 3 })
-    // await expect(title).toBeVisible()
-  
-    // const message = page.getByText('Verifique o número do pedido e tente novamente')
-    // const message = page.locator('//p[text()="Verifique o número do pedido e tente novamente"]')
-  
-    // const message = page.locator('p', { hasText: 'Verifique o número do pedido e tente novamente' })
-    // await expect(message).toBeVisible()
-  
     await expect(page.locator('#root')).toMatchAriaSnapshot(`
       - img
       - heading "${expectedErrorMessage}" [level=3]
       - paragraph: ${expectedInformationMessage}
-      `)
-  
+    `)
   })
-
-
 })
-
-
-
