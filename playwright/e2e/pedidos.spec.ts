@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers'
 
 
-test.describe('Consulta de Pedidos', () => {
+test.describe('View order', () => {
 
   test.beforeEach(async ({ page }) => {
 
