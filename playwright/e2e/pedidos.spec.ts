@@ -1,46 +1,43 @@
 import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers'
 
+/// AAA - Arrange, Act, Assert
 
-test.describe('View order', () => {
+test.describe('Consulta de Pedido', () => {
 
   test.beforeEach(async ({ page }) => {
-
-    const baseUrl = 'http://localhost:5173/'
-
     // Arrange
-    await page.goto(baseUrl)
+    await page.goto('http://localhost:5173/')
     await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint')
 
     await page.getByRole('link', { name: 'Consultar Pedido' }).click()
     await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
-
   })
 
-  test('It should display the approved order details after submitting a valid order number', async ({ page }) => {
+  test('deve consultar um pedido aprovado', async ({ page }) => {
 
     // Test Data
     const order = {
-      orderNumber: 'VLO-IJJFFY',
+      number: 'VLO-IJJFFY',
+      status: 'APROVADO',
       color: 'Midnight Black',
       wheels: 'aero Wheels',
       customer: {
         name: 'George Mathias',
         email: 'mathias@gmail.com'
       },
-      payment_method: 'À Vista',
-      status: 'APROVADO'
+      payment: 'À Vista'
     }
 
-    // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.orderNumber)
+    // Act  
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
     await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
     // Assert
-    await expect(page.getByTestId(`order-result-${order.orderNumber}`)).toMatchAriaSnapshot(`
+    await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
       - img
       - paragraph: Pedido
-      - paragraph: ${order.orderNumber}
+      - paragraph: ${order.number}
       - status:
         - img
         - text: ${order.status}
@@ -63,104 +60,44 @@ test.describe('View order', () => {
       - paragraph: Data do Pedido
       - paragraph: /\\d+\\/\\d+\\/\\d+/
       - heading "Pagamento" [level=4]
-      - paragraph: ${order.payment_method}
+      - paragraph: ${order.payment}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-    `);
+      `);
 
     const statusBadge = page.getByRole('status').filter({ hasText: order.status })
-    await expect(statusBadge).toBeVisible()
+
     await expect(statusBadge).toHaveClass(/bg-green-100/)
     await expect(statusBadge).toHaveClass(/text-green-700/)
 
     const statusIcon = statusBadge.locator('svg')
-    await expect(statusIcon).toBeVisible()
     await expect(statusIcon).toHaveClass(/lucide-circle-check-big/)
+
   })
 
-  test('It should display the order under review details after submitting a valid order number', async ({ page }) => {
+  test('deve consultar um pedido reprovado', async ({ page }) => {
 
     // Test Data
     const order = {
-      orderNumber: 'VLO-JL8DII',
-      color: 'Glacier Blue',
-      wheels: 'aero Wheels',
-      customer: {
-        name: 'Geni Valdo',
-        email: 'genivaldo@velo.dev'
-      },
-      payment_method: 'À Vista',
-      status: 'EM_ANALISE'
-    }
-
-    // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.orderNumber)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
-
-    // Assert
-    await expect(page.getByTestId(`order-result-${order.orderNumber}`)).toMatchAriaSnapshot(`
-      - img
-      - paragraph: Pedido
-      - paragraph: ${order.orderNumber}
-      - status:
-        - img
-        - text: ${order.status}
-      - img "Velô Sprint"
-      - paragraph: Modelo
-      - paragraph: Velô Sprint
-      - paragraph: Cor
-      - paragraph: ${order.color}
-      - paragraph: Interior
-      - paragraph: cream
-      - paragraph: Rodas
-      - paragraph: ${order.wheels}
-      - heading "Dados do Cliente" [level=4]
-      - paragraph: Nome
-      - paragraph: ${order.customer.name}
-      - paragraph: Email
-      - paragraph: ${order.customer.email}
-      - paragraph: Loja de Retirada
-      - paragraph
-      - paragraph: Data do Pedido
-      - paragraph: /\\d+\\/\\d+\\/\\d+/
-      - heading "Pagamento" [level=4]
-      - paragraph: ${order.payment_method}
-      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-    `);
-
-    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
-    await expect(statusBadge).toBeVisible()
-    await expect(statusBadge).toHaveClass(/bg-amber-100/)
-    await expect(statusBadge).toHaveClass(/text-amber-700/)
-
-    const statusIcon = statusBadge.locator('svg')
-    await expect(statusIcon).toBeVisible()
-    await expect(statusIcon).toHaveClass(/lucide-clock/)
-  })
-
-  test('It should display the declined order details after submitting a valid order number', async ({ page }) => {
-
-    // Test Data
-    const order = {
-      orderNumber: 'VLO-DOPGB6',
+      number: 'VLO-DOPGB6',
+      status: 'REPROVADO',
       color: 'Midnight Black',
       wheels: 'sport Wheels',
       customer: {
         name: 'Steve Trabalho',
         email: 'trabalho@apple.com'
       },
-      payment_method: 'À Vista',
-      status: 'REPROVADO'
+      payment: 'À Vista'
     }
 
-    // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.orderNumber)
+    // Act  
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
     await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
     // Assert
-    await expect(page.getByTestId(`order-result-${order.orderNumber}`)).toMatchAriaSnapshot(`
+    await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
       - img
       - paragraph: Pedido
-      - paragraph: ${order.orderNumber}
+      - paragraph: ${order.number}
       - status:
         - img
         - text: ${order.status}
@@ -183,35 +120,91 @@ test.describe('View order', () => {
       - paragraph: Data do Pedido
       - paragraph: /\\d+\\/\\d+\\/\\d+/
       - heading "Pagamento" [level=4]
-      - paragraph: ${order.payment_method}
+      - paragraph: ${order.payment}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
-    `);
+      `);
 
-    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
-    await expect(statusBadge).toBeVisible()
-    await expect(statusBadge).toHaveClass(/bg-red-100/)
-    await expect(statusBadge).toHaveClass(/text-red-700/)
+      const statusBadge = page.getByRole('status').filter({ hasText: order.status })
 
-    const statusIcon = statusBadge.locator('svg')
-    await expect(statusIcon).toBeVisible()
-    await expect(statusIcon).toHaveClass(/lucide-circle-x/)
+      await expect(statusBadge).toHaveClass(/bg-red-100/)
+      await expect(statusBadge).toHaveClass(/text-red-700/)
+  
+      const statusIcon = statusBadge.locator('svg')
+      await expect(statusIcon).toHaveClass(/lucide-circle-x/)
   })
 
-  test('It should display an error message when submitting an invalid order number', async ({ page }) => {
+  test('deve consultar um pedido em analise', async ({ page }) => {
 
-    const orderNumber = generateOrderCode()
-    const expectedErrorMessage = "Pedido não encontrado"
-    const expectedInformationMessage = "Verifique o número do pedido e tente novamente"
+    // Test Data
+    const order = {
+      number: 'VLO-JL8DII',
+      status: 'EM_ANALISE',
+      color: 'Glacier Blue',
+      wheels: 'aero Wheels',
+      customer: {
+        name: 'Geni Valdo',
+        email: 'genivaldo@velo.dev'
+      },
+      payment: 'À Vista'
+    }
 
-    // Act
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(orderNumber)
+    // Act  
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
     await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
     // Assert
+    await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
+      - img
+      - paragraph: Pedido
+      - paragraph: ${order.number}
+      - status:
+        - img
+        - text: ${order.status}
+      - img "Velô Sprint"
+      - paragraph: Modelo
+      - paragraph: Velô Sprint
+      - paragraph: Cor
+      - paragraph: ${order.color}
+      - paragraph: Interior
+      - paragraph: cream
+      - paragraph: Rodas
+      - paragraph: ${order.wheels}
+      - heading "Dados do Cliente" [level=4]
+      - paragraph: Nome
+      - paragraph: ${order.customer.name}
+      - paragraph: Email
+      - paragraph: ${order.customer.email}
+      - paragraph: Loja de Retirada
+      - paragraph
+      - paragraph: Data do Pedido
+      - paragraph: /\\d+\\/\\d+\\/\\d+/
+      - heading "Pagamento" [level=4]
+      - paragraph: ${order.payment}
+      - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
+      `);
+
+      const statusBadge = page.getByRole('status').filter({ hasText: order.status })
+
+      await expect(statusBadge).toHaveClass(/bg-amber-100/)
+      await expect(statusBadge).toHaveClass(/text-amber-700/)
+  
+      const statusIcon = statusBadge.locator('svg')
+      await expect(statusIcon).toHaveClass(/lucide-clock/)
+  })
+
+  test('deve exibir mensagem quando o pedido não é encontrado', async ({ page }) => {
+
+    const order = generateOrderCode()
+
+    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order)
+    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+
+
     await expect(page.locator('#root')).toMatchAriaSnapshot(`
       - img
-      - heading "${expectedErrorMessage}" [level=3]
-      - paragraph: ${expectedInformationMessage}
-    `)
+      - heading "Pedido não encontrado" [level=3]
+      - paragraph: Verifique o número do pedido e tente novamente
+      `)
+
   })
 })
