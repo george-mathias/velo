@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers'
+import { OrderLookupPage } from '../support/pages/OrderLookupPage'
 
 /// AAA - Arrange, Act, Assert
 
@@ -30,8 +31,8 @@ test.describe('Consulta de Pedido', () => {
     }
 
     // Act  
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.buscarPedido(order.number)
 
     // Assert
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -90,8 +91,8 @@ test.describe('Consulta de Pedido', () => {
     }
 
     // Act  
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.buscarPedido(order.number)
 
     // Assert
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -149,8 +150,8 @@ test.describe('Consulta de Pedido', () => {
     }
 
     // Act  
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.buscarPedido(order.number)
 
     // Assert
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
