@@ -41,8 +41,9 @@ test.describe('View order', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${order.orderNumber}
-      - img
-      - text: ${order.status}
+      - status:
+        - img
+        - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -65,6 +66,15 @@ test.describe('View order', () => {
       - paragraph: ${order.payment_method}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
     `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
+    await expect(statusBadge).toBeVisible()
+    await expect(statusBadge).toHaveClass(/bg-green-100/)
+    await expect(statusBadge).toHaveClass(/text-green-700/)
+
+    const statusIcon = statusBadge.locator('svg')
+    await expect(statusIcon).toBeVisible()
+    await expect(statusIcon).toHaveClass(/lucide-circle-check-big/)
   })
 
   test('It should display the order under review details after submitting a valid order number', async ({ page }) => {
@@ -91,8 +101,9 @@ test.describe('View order', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${order.orderNumber}
-      - img
-      - text: ${order.status}
+      - status:
+        - img
+        - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -115,6 +126,15 @@ test.describe('View order', () => {
       - paragraph: ${order.payment_method}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
     `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
+    await expect(statusBadge).toBeVisible()
+    await expect(statusBadge).toHaveClass(/bg-amber-100/)
+    await expect(statusBadge).toHaveClass(/text-amber-700/)
+
+    const statusIcon = statusBadge.locator('svg')
+    await expect(statusIcon).toBeVisible()
+    await expect(statusIcon).toHaveClass(/lucide-clock/)
   })
 
   test('It should display the declined order details after submitting a valid order number', async ({ page }) => {
@@ -141,8 +161,9 @@ test.describe('View order', () => {
       - img
       - paragraph: Pedido
       - paragraph: ${order.orderNumber}
-      - img
-      - text: ${order.status}
+      - status:
+        - img
+        - text: ${order.status}
       - img "Velô Sprint"
       - paragraph: Modelo
       - paragraph: Velô Sprint
@@ -165,6 +186,15 @@ test.describe('View order', () => {
       - paragraph: ${order.payment_method}
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
     `);
+
+    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
+    await expect(statusBadge).toBeVisible()
+    await expect(statusBadge).toHaveClass(/bg-red-100/)
+    await expect(statusBadge).toHaveClass(/text-red-700/)
+
+    const statusIcon = statusBadge.locator('svg')
+    await expect(statusIcon).toBeVisible()
+    await expect(statusIcon).toHaveClass(/lucide-circle-x/)
   })
 
   test('It should display an error message when submitting an invalid order number', async ({ page }) => {
