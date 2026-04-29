@@ -67,7 +67,7 @@ test.describe('View order', () => {
     `);
   })
 
-  test('It should display details for an order under review after submitting a valid order number', async ({ page }) => {
+  test('It should display the order under review details after submitting a valid order number', async ({ page }) => {
 
     // Test Data
     const order = {
@@ -167,7 +167,7 @@ test.describe('View order', () => {
     `);
   })
 
-  test('It should return an error message when submitting an invalid order number', async ({ page }) => {
+  test('It should display an error message when submitting an invalid order number', async ({ page }) => {
 
     const orderNumber = generateOrderCode()
     const expectedErrorMessage = "Pedido não encontrado"
