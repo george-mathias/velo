@@ -1,5 +1,6 @@
 export function generateOrderCode() {
     const prefix = 'VLO'
+
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     let randomPart = ''
 

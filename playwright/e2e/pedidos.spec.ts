@@ -1,24 +1,14 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../support/fixtures'
 import { generateOrderCode } from '../support/helpers'
-import { OrderLookupPage } from '../support/pages/OrderLookupPage'
-
-/// AAA - Arrange, Act, Assert
+import type { OrderDetails } from '../support/actions/orderLookupActions'
 
 test.describe('Consulta de Pedido', () => {
-
-  test.beforeEach(async ({ page }) => {
-    // Arrange
-    await page.goto('http://localhost:5173/')
-    await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint')
-
-    await page.getByRole('link', { name: 'Consultar Pedido' }).click()
-    await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
+  test.beforeEach(async ({ app }) => {
+    await app.orderLookup.open()
   })
 
-  test('deve consultar um pedido aprovado', async ({ page }) => {
-
-    // Test Data
-    const order = {
+  test('deve consultar um pedido aprovado', async ({ app }) => {
+    const order: OrderDetails = {
       number: 'VLO-IJJFFY',
       status: 'APROVADO' as const,
       color: 'Midnight Black',
@@ -27,24 +17,16 @@ test.describe('Consulta de Pedido', () => {
         name: 'George Mathias',
         email: 'mathias@gmail.com'
       },
-      payment: 'À Vista'
+      payment: 'À Vista',
     }
 
-    // Act  
-    const orderLookupPage = new OrderLookupPage(page)
-    await orderLookupPage.searchOrder(order.number)
-
-    // Assert
-    await orderLookupPage.validateOrderResult(order)
-
-    // Validação do badge de status encapsulada no Page Object
-    await orderLookupPage.validateStatusBadge(order.status)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve consultar um pedido reprovado', async ({ page }) => {
-
-    // Test Data
-    const order = {
+  test('deve consultar um pedido reprovado', async ({ app }) => {
+    const order: OrderDetails = {
       number: 'VLO-DOPGB6',
       status: 'REPROVADO' as const,
       color: 'Midnight Black',
@@ -53,24 +35,16 @@ test.describe('Consulta de Pedido', () => {
         name: 'Steve Trabalho',
         email: 'trabalho@apple.com'
       },
-      payment: 'À Vista'
+      payment: 'À Vista',
     }
 
-    // Act  
-    const orderLookupPage = new OrderLookupPage(page)
-    await orderLookupPage.searchOrder(order.number)
-
-    // Assert
-    await orderLookupPage.validateOrderResult(order)
-
-    // Validação do badge de status encapsulada no Page Object
-    await orderLookupPage.validateStatusBadge(order.status)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve consultar um pedido em analise', async ({ page }) => {
-
-    // Test Data
-    const order = {
+  test('deve consultar um pedido em analise', async ({ app }) => {
+    const order: OrderDetails = {
       number: 'VLO-JL8DII',
       status: 'EM_ANALISE' as const,
       color: 'Glacier Blue',
@@ -79,33 +53,31 @@ test.describe('Consulta de Pedido', () => {
         name: 'Geni Valdo',
         email: 'genivaldo@velo.dev'
       },
-      payment: 'À Vista'
+      payment: 'À Vista',
     }
 
-    // Act  
-    const orderLookupPage = new OrderLookupPage(page)
-    await orderLookupPage.searchOrder(order.number)
-
-    // Assert
-    await orderLookupPage.validateOrderResult(order)
-
-    // Validação do badge de status encapsulada no Page Object
-    await orderLookupPage.validateStatusBadge(order.status)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve exibir mensagem quando o pedido não é encontrado', async ({ page }) => {
-
+  test('deve exibir mensagem quando o pedido não é encontrado', async ({ app }) => {
     const order = generateOrderCode()
+    await app.orderLookup.searchOrder(order)
+    await app.orderLookup.validateOrderNotFound()
+  })
 
-    const orderLookupPage = new OrderLookupPage(page)
-    await orderLookupPage.searchOrder(order)
+  test('deve exibir mensagem quando o código do pedido está fora do padrão', async ({ app }) => {
+    const orderCode = 'XYZ-999-INVALIDO'
+    await app.orderLookup.searchOrder(orderCode)
+    await app.orderLookup.validateOrderNotFound()
+  })
 
+  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app, page }) => {
+    const button = app.orderLookup.elements.searchButton
+    await expect(button).toBeDisabled()
 
-    await expect(page.locator('#root')).toMatchAriaSnapshot(`
-      - img
-      - heading "Pedido não encontrado" [level=3]
-      - paragraph: Verifique o número do pedido e tente novamente
-      `)
-
+    await app.orderLookup.elements.orderInput.fill('     ')
+    await expect(button).toBeDisabled()
   })
 })
