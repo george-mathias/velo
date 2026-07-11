@@ -1,6 +1,8 @@
 import { Page, expect } from '@playwright/test'
 
 export function createConfiguratorActions(page: Page) {
+  const optionalCheckbox = (name: string | RegExp) => page.getByRole('checkbox', { name })
+
   return {
     async open() {
       await page.goto('/configure')
@@ -21,23 +23,22 @@ export function createConfiguratorActions(page: Page) {
     },
 
     async expectCarImageSrc(src: string) {
-      const carImage = page.getByRole('img', { name: /^Velô Sprint/ })
+      const carImage = page.locator('img[alt^="Velô Sprint"]')
       await expect(carImage).toHaveAttribute('src', src)
     },
 
-    async toggleOptional(name: string | RegExp) {
-      await page.getByRole('checkbox', { name }).click()
+    async checkOptional(name: string | RegExp) {
+      await expect(optionalCheckbox(name)).toBeVisible()
+      await optionalCheckbox(name).check()
     },
 
-    async goToCheckout() {
+    async uncheckOptional(name: string | RegExp) {
+      await expect(optionalCheckbox(name)).toBeVisible()
+      await optionalCheckbox(name).uncheck()
+    },
+
+    async finishConfigurator() {
       await page.getByRole('button', { name: 'Monte o Seu' }).click()
-    },
-
-    async expectCheckoutTotal(price: string) {
-      await expect(page).toHaveURL('/order')
-      const totalElement = page.getByTestId('summary-total-price')
-      await expect(totalElement).toBeVisible()
-      await expect(totalElement).toHaveText(price)
     },
   }
 }
