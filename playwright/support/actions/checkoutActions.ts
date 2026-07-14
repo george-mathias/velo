@@ -56,5 +56,13 @@ export function createCheckoutActions(page: Page) {
     async submit() {
       await page.getByRole('button', { name: 'Confirmar Pedido' }).click()
     },
+
+    async selectPaymentMethod(method: string) {
+      await page.getByRole('button', { name: method }).click()
+    },
+
+    async expectOrderSuccess() {
+      await expect(page.getByRole('heading', { name: 'Pedido Aprovado!' })).toBeVisible()
+    }
   }
 }

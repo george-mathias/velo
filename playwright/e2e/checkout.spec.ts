@@ -2,20 +2,15 @@ import { test, expect } from '../support/fixtures'
 
 test.describe('Checkout', () => {
 
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/order')
-    await expect(page.getByRole('heading', { name: 'Finalizar Pedido' })).toBeVisible()
-  })
-
   test.describe('Validações de campos obrigatórios', () => {
-
 
     let alerts: any
 
-    test.beforeEach(async ({ app }) => {
+    test.beforeEach(async ({ app, page }) => {
+      await page.goto('/order')
+      await expect(page.getByRole('heading', { name: 'Finalizar Pedido' })).toBeVisible()
       alerts = app.checkout.elements.alerts
     })
-
 
     test('deve validar obrigatoriedade de todos os campos em branco', async ({ app }) => {
       // Act
@@ -118,6 +113,45 @@ test.describe('Checkout', () => {
 
       // Assert
       await expect(alerts.terms).toHaveText('Aceite os termos')
+    })
+  })
+
+  test.describe('Pagamento e confirmação', () => {
+
+    test('deve realizar pedido com pagamento à vista com sucesso', async ({ page, app }) => {
+
+      const validCustomer = {
+        name: 'João',
+        lastname: 'Silva',
+        email: 'joao.silva@teste.com',
+        document: '526.605.690-88',
+        phone: '(11) 99999-9999',
+        store: 'Velô Paulista',
+        paymentMethod: 'À Vista',
+        totalPrice: 'R$ 40.000,00'
+      }
+
+      // Arrange
+      await page.goto('/')
+      await page.getByRole('link', { name: 'Configure Agora' }).click()
+
+      await app.configurator.expectPrice(validCustomer.totalPrice)
+      await app.configurator.finishConfigurator()
+      await app.checkout.expectLoaded()
+
+      await app.checkout.fillCustomerlData(validCustomer)
+      await app.checkout.selectStore(validCustomer.store)
+
+      // Act
+      await app.checkout.selectPaymentMethod(validCustomer.paymentMethod)
+      await expect(page.getByRole('button', { name: validCustomer.paymentMethod })).toContainText(validCustomer.totalPrice)
+      await app.checkout.expectSummaryTotal(validCustomer.totalPrice)
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectOrderSuccess()
+      await expect(page.getByText('Seu pedido foi processado com sucesso.')).toBeVisible()
     })
   })
 })
