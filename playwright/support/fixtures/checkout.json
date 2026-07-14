@@ -1,0 +1,45 @@
+{
+  "minimo_caracteres": {
+    "number": "VLO-CHK01",
+    "name": "A",
+    "lastname": "B",
+    "email": "papito@teste.com",
+    "document": "00000014141",
+    "phone": "(11) 99999-9999"
+  },
+  "email_invalido": {
+    "number": "VLO-CHK02",
+    "name": "Fernando",
+    "lastname": "Papito",
+    "email": "papito@.com",
+    "document": "00000014141",
+    "phone": "(11) 99999-9999"
+  },
+  "cpf_invalido": {
+    "number": "VLO-CHK03",
+    "name": "Fernando",
+    "lastname": "Papito",
+    "email": "papito@test.com",
+    "document": "00000014199",
+    "phone": "(11) 99999-9999"
+  },
+  "termos_obrigatorios": {
+    "number": "VLO-CHK04",
+    "name": "Fernando",
+    "lastname": "Papito",
+    "email": "papito@test.com",
+    "document": "00000014199",
+    "phone": "(11) 99999-9999"
+  },
+  "sucesso": {
+    "number": "VLO-CHK05",
+    "name": "João",
+    "lastname": "Silva",
+    "email": "joao.silva@teste.com",
+    "document": "526.605.690-88",
+    "phone": "(11) 99999-9999",
+    "store": "Velô Paulista",
+    "paymentMethod": "À Vista",
+    "totalPrice": "R$ 40.000,00"
+  }
+}

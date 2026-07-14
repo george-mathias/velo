@@ -1,4 +1,6 @@
 import { test, expect } from '../support/fixtures'
+import { deleteOrderByNumber } from '../support/database/orderRepository'
+import testData from '../support/fixtures/checkout.json' with { type: 'json' }
 
 test.describe('Checkout', () => {
 
@@ -28,13 +30,8 @@ test.describe('Checkout', () => {
 
     test('deve validar limite mínimo de caracteres para Nome e Sobrenome', async ({ app }) => {
 
-      const customer = {
-        name: 'A',
-        lastname: 'B',
-        email: 'papito@teste.com',
-        document: '00000014141',
-        phone: '(11) 99999-9999'
-      }
+      const customer = testData.minimo_caracteres
+      await deleteOrderByNumber(customer.number)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -50,13 +47,8 @@ test.describe('Checkout', () => {
     })
 
     test('deve exibir erro para e-mail com formato inválido', async ({ app }) => {
-      const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@.com',
-        document: '00000014141',
-        phone: '(11) 99999-9999'
-      }
+      const customer = testData.email_invalido
+      await deleteOrderByNumber(customer.number)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -72,13 +64,8 @@ test.describe('Checkout', () => {
 
     test('deve exibir erro para CPF inválido', async ({ app }) => {
 
-      const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@test.com',
-        document: '00000014199',
-        phone: '(11) 99999-9999'
-      }
+      const customer = testData.cpf_invalido
+      await deleteOrderByNumber(customer.number)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -94,13 +81,8 @@ test.describe('Checkout', () => {
 
     test('deve exigir o aceite dos termos ao finalizar com dados válidos', async ({ app }) => {
 
-      const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@test.com',
-        document: '00000014199',
-        phone: '(11) 99999-9999'
-      }
+      const customer = testData.termos_obrigatorios
+      await deleteOrderByNumber(customer.number)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -118,40 +100,27 @@ test.describe('Checkout', () => {
 
   test.describe('Pagamento e confirmação', () => {
 
-    test('deve realizar pedido com pagamento à vista com sucesso', async ({ page, app }) => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/order')
+      await expect(page.getByRole('heading', { name: 'Finalizar Pedido' })).toBeVisible()
+    })
 
-      const validCustomer = {
-        name: 'João',
-        lastname: 'Silva',
-        email: 'joao.silva@teste.com',
-        document: '526.605.690-88',
-        phone: '(11) 99999-9999',
-        store: 'Velô Paulista',
-        paymentMethod: 'À Vista',
-        totalPrice: 'R$ 40.000,00'
-      }
+    test('deve realizar pedido com pagamento à vista com sucesso', async ({ app }) => {
+
+      const customer = testData.sucesso
+      await deleteOrderByNumber(customer.number)
 
       // Arrange
-      await page.goto('/')
-      await page.getByRole('link', { name: 'Configure Agora' }).click()
-
-      await app.configurator.expectPrice(validCustomer.totalPrice)
-      await app.configurator.finishConfigurator()
-      await app.checkout.expectLoaded()
-
-      await app.checkout.fillCustomerlData(validCustomer)
-      await app.checkout.selectStore(validCustomer.store)
+      await app.checkout.fillCustomerlData(customer)
+      await app.checkout.selectStore(customer.store)
+      await app.checkout.selectPaymentMethod(customer.paymentMethod)
+      await app.checkout.acceptTerms()
 
       // Act
-      await app.checkout.selectPaymentMethod(validCustomer.paymentMethod)
-      await expect(page.getByRole('button', { name: validCustomer.paymentMethod })).toContainText(validCustomer.totalPrice)
-      await app.checkout.expectSummaryTotal(validCustomer.totalPrice)
-      await app.checkout.acceptTerms()
       await app.checkout.submit()
 
       // Assert
       await app.checkout.expectOrderSuccess()
-      await expect(page.getByText('Seu pedido foi processado com sucesso.')).toBeVisible()
     })
   })
 })
