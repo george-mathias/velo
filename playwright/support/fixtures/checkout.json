@@ -36,10 +36,21 @@
     "name": "João",
     "lastname": "Silva",
     "email": "joao.silva@teste.com",
-    "document": "526.605.690-88",
+    "document": "52660569088",
     "phone": "(11) 99999-9999",
     "store": "Velô Paulista",
     "paymentMethod": "À Vista",
+    "totalPrice": "R$ 40.000,00"
+  },
+  "score_maior_700": {
+    "number": "VLO-CHK06",
+    "name": "Fernando",
+    "lastname": "Silva",
+    "email": "fernando.silva@teste.com",
+    "document": "73279052009",
+    "phone": "(11) 99999-9999",
+    "store": "Velô Morumbi",
+    "paymentMethod": "Financiamento",
     "totalPrice": "R$ 40.000,00"
   }
 }

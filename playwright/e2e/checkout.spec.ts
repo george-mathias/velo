@@ -1,5 +1,5 @@
 import { test, expect } from '../support/fixtures'
-import { deleteOrderByNumber, deleteOrderByEmail } from '../support/database/orderRepository'
+import { deleteOrderByEmail } from '../support/database/orderRepository'
 import testData from '../support/fixtures/checkout.json' with { type: 'json' }
 
 test.describe('Checkout', () => {
@@ -109,6 +109,35 @@ test.describe('Checkout', () => {
 
       const customer = testData.sucesso
       await deleteOrderByEmail(customer.email)
+
+      // Arrange
+      await app.checkout.fillCustomerlData(customer)
+      await app.checkout.selectStore(customer.store)
+      await app.checkout.selectPaymentMethod(customer.paymentMethod)
+      await app.checkout.acceptTerms()
+
+      // Act
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectOrderSuccess()
+    })
+
+    test('deve aprovar automaticamente o crédito quando o score do CPF for maior que 700 no financiamento', async ({ app, page }) => {
+
+      const customer = testData.score_maior_700
+      await deleteOrderByEmail(customer.email)
+
+      await page.route("**/functions/v1/credit-analysis", async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            status: 'Done',
+            score: 710
+          })
+        })
+      })
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
