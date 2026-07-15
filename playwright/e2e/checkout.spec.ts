@@ -1,5 +1,5 @@
 import { test, expect } from '../support/fixtures'
-import { deleteOrderByNumber } from '../support/database/orderRepository'
+import { deleteOrderByNumber, deleteOrderByEmail } from '../support/database/orderRepository'
 import testData from '../support/fixtures/checkout.json' with { type: 'json' }
 
 test.describe('Checkout', () => {
@@ -31,7 +31,7 @@ test.describe('Checkout', () => {
     test('deve validar limite mínimo de caracteres para Nome e Sobrenome', async ({ app }) => {
 
       const customer = testData.minimo_caracteres
-      await deleteOrderByNumber(customer.number)
+      await deleteOrderByEmail(customer.email)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -48,7 +48,7 @@ test.describe('Checkout', () => {
 
     test('deve exibir erro para e-mail com formato inválido', async ({ app }) => {
       const customer = testData.email_invalido
-      await deleteOrderByNumber(customer.number)
+      await deleteOrderByEmail(customer.email)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -65,7 +65,7 @@ test.describe('Checkout', () => {
     test('deve exibir erro para CPF inválido', async ({ app }) => {
 
       const customer = testData.cpf_invalido
-      await deleteOrderByNumber(customer.number)
+      await deleteOrderByEmail(customer.email)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -82,7 +82,7 @@ test.describe('Checkout', () => {
     test('deve exigir o aceite dos termos ao finalizar com dados válidos', async ({ app }) => {
 
       const customer = testData.termos_obrigatorios
-      await deleteOrderByNumber(customer.number)
+      await deleteOrderByEmail(customer.email)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
@@ -108,7 +108,7 @@ test.describe('Checkout', () => {
     test('deve realizar pedido com pagamento à vista com sucesso', async ({ app }) => {
 
       const customer = testData.sucesso
-      await deleteOrderByNumber(customer.number)
+      await deleteOrderByEmail(customer.email)
 
       // Arrange
       await app.checkout.fillCustomerlData(customer)
